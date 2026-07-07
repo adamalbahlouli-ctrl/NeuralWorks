@@ -191,7 +191,7 @@
   // Replace these three values after setting up your EmailJS account.
   // See the setup guide in the README / walkthrough artifact.
   var EMAILJS_PUBLIC_KEY  = 'LQnmFTXdf1e3jfTU0';           // Account API Keys
-  var EMAILJS_SERVICE_ID  = 'service_hrfc49nejjewvwvke';              // Email Services tab
+  var EMAILJS_SERVICE_ID  = 'service_AdamNoxtary20085';              // Email Services tab
   var EMAILJS_TEMPLATE_ID = 'template_79xyy3w';             // Email Templates tab
   // -----------------------------------------------------------
 
@@ -200,7 +200,7 @@
       console.warn('[NeuralWorks] EmailJS library not loaded.');
       return;
     }
-    emailjs.init(EMAILJS_PUBLIC_KEY);
+    emailjs.init("LQnmFTXdf1e3jfTU0");
   }
 
   function initContactForm() {
@@ -263,12 +263,15 @@
       }
 
       try {
-        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+        const templateParams = {
           name:    name,
           email:   email,
           service: service || 'Not specified',
           message: message,
-        });
+        };
+
+        const result = await emailjs.send("service_AdamNoxtary20085", "template_79xyy3w", templateParams);
+        console.log(result);
 
         // â”€â”€ Success â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         submitBtn.disabled = false;
@@ -282,7 +285,7 @@
 
       } catch (err) {
         // â”€â”€ Failure â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        console.error('[NeuralWorks] EmailJS send error:', err);
+        console.error(err);
         submitBtn.disabled = false;
         submitBtn.innerHTML = `Send Message ${SUBMIT_ICON}`;
         showError();
