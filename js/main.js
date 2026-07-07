@@ -1,5 +1,5 @@
 /**
- * NeuralWorks — Main Application Script
+ * NeuralWorks â€” Main Application Script
  * Navigation, settings panel, scroll reveal, contact form, toast notifications
  */
 
@@ -21,7 +21,7 @@
     const container = document.getElementById('toast-container');
     if (!container) return;
 
-    const icon = type === 'success' ? '✅' : '❌';
+    const icon = type === 'success' ? 'âœ…' : 'âŒ';
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
     toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
@@ -184,16 +184,16 @@
   }
 
   // ============================================================
-  // CONTACT FORM — EmailJS Integration
+  // CONTACT FORM â€” EmailJS Integration
   // ============================================================
 
-  // ─── EmailJS Configuration ────────────────────────────────────
+  // -----------------------------------------------------------
   // Replace these three values after setting up your EmailJS account.
   // See the setup guide in the README / walkthrough artifact.
-  var EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';   // From: Account → API Keys
-  var EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';   // From: Email Services tab
-  var EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';  // From: Email Templates tab
-  // ─────────────────────────────────────────────────────────────
+  var EMAILJS_PUBLIC_KEY  = 'LQnmFTXdf1e3jfTU0';           // Account API Keys
+  var EMAILJS_SERVICE_ID  = 'service_hrfc49nejjewvwvke';              // Email Services tab
+  var EMAILJS_TEMPLATE_ID = 'template_79xyy3w';             // Email Templates tab
+  // -----------------------------------------------------------
 
   function initEmailJS() {
     if (typeof emailjs === 'undefined') {
@@ -237,7 +237,7 @@
       const service = form.service ? form.service.value : '';
       const message = form.message.value.trim();
 
-      // ── Validation ──────────────────────────────────────────
+      // â”€â”€ Validation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       if (!name || !email || !message) {
         showToast('Please fill in all required fields.', 'error');
         return;
@@ -248,13 +248,13 @@
         return;
       }
 
-      // ── Loading state ────────────────────────────────────────
+      // â”€â”€ Loading state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       submitBtn.disabled = true;
-      submitBtn.textContent = 'Sending…';
+      submitBtn.textContent = 'Sendingâ€¦';
 
-      // ── Send via EmailJS ─────────────────────────────────────
+      // â”€â”€ Send via EmailJS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       if (typeof emailjs === 'undefined') {
-        // EmailJS not loaded — show error
+        // EmailJS not loaded â€” show error
         submitBtn.disabled = false;
         submitBtn.innerHTML = `Send Message ${SUBMIT_ICON}`;
         showError();
@@ -264,14 +264,13 @@
 
       try {
         await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-          from_name:    name,
-          from_email:   email,
-          service:      service || 'Not specified',
-          message:      message,
-          to_email:     'Noxtary.contact@gmail.com',
+          name:    name,
+          email:   email,
+          service: service || 'Not specified',
+          message: message,
         });
 
-        // ── Success ────────────────────────────────────────────
+        // â”€â”€ Success â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         submitBtn.disabled = false;
         submitBtn.innerHTML = `Send Message ${SUBMIT_ICON}`;
         showSuccess();
@@ -282,7 +281,7 @@
         setTimeout(() => { if (success) success.style.display = 'none'; }, 6000);
 
       } catch (err) {
-        // ── Failure ────────────────────────────────────────────
+        // â”€â”€ Failure â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         console.error('[NeuralWorks] EmailJS send error:', err);
         submitBtn.disabled = false;
         submitBtn.innerHTML = `Send Message ${SUBMIT_ICON}`;
