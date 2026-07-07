@@ -184,23 +184,60 @@
   }
 
   // ============================================================
-  // CONTACT FORM
+  // CONTACT FORM — EmailJS Integration
   // ============================================================
+
+  // ─── EmailJS Configuration ────────────────────────────────────
+  // Replace these three values after setting up your EmailJS account.
+  // See the setup guide in the README / walkthrough artifact.
+  var EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';   // From: Account → API Keys
+  var EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';   // From: Email Services tab
+  var EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';  // From: Email Templates tab
+  // ─────────────────────────────────────────────────────────────
+
+  function initEmailJS() {
+    if (typeof emailjs === 'undefined') {
+      console.warn('[NeuralWorks] EmailJS library not loaded.');
+      return;
+    }
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+  }
+
   function initContactForm() {
     const form      = document.getElementById('contact-form');
     const submitBtn = document.getElementById('contact-submit');
     const success   = document.getElementById('form-success');
+    const errorBox  = document.getElementById('form-error');
 
     if (!form) return;
 
+    const SUBMIT_ICON = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`;
+
+    function showSuccess() {
+      if (success)  { success.style.display  = 'block'; }
+      if (errorBox) { errorBox.style.display  = 'none';  }
+    }
+
+    function showError() {
+      if (errorBox) { errorBox.style.display  = 'block'; }
+      if (success)  { success.style.display   = 'none';  }
+    }
+
+    function hideMessages() {
+      if (success)  success.style.display  = 'none';
+      if (errorBox) errorBox.style.display = 'none';
+    }
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      hideMessages();
 
       const name    = form.name.value.trim();
       const email   = form.email.value.trim();
+      const service = form.service ? form.service.value : '';
       const message = form.message.value.trim();
 
-      // Basic validation
+      // ── Validation ──────────────────────────────────────────
       if (!name || !email || !message) {
         showToast('Please fill in all required fields.', 'error');
         return;
@@ -211,22 +248,47 @@
         return;
       }
 
-      // Simulate sending
+      // ── Loading state ────────────────────────────────────────
       submitBtn.disabled = true;
       submitBtn.textContent = 'Sending…';
 
-      await new Promise(resolve => setTimeout(resolve, 1200));
-
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = `Send Message <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`;
-
-      if (success) {
-        success.style.display = 'block';
-        setTimeout(() => { success.style.display = 'none'; }, 5000);
+      // ── Send via EmailJS ─────────────────────────────────────
+      if (typeof emailjs === 'undefined') {
+        // EmailJS not loaded — show error
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `Send Message ${SUBMIT_ICON}`;
+        showError();
+        showToast('Email service unavailable. Please try again later.', 'error');
+        return;
       }
 
-      showToast('Message sent! We\'ll get back to you shortly.', 'success');
-      form.reset();
+      try {
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+          from_name:    name,
+          from_email:   email,
+          service:      service || 'Not specified',
+          message:      message,
+          to_email:     'Noxtary.contact@gmail.com',
+        });
+
+        // ── Success ────────────────────────────────────────────
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `Send Message ${SUBMIT_ICON}`;
+        showSuccess();
+        showToast("Message sent! We'll get back to you shortly.", 'success');
+        form.reset();
+
+        // Auto-hide success message after 6 s
+        setTimeout(() => { if (success) success.style.display = 'none'; }, 6000);
+
+      } catch (err) {
+        // ── Failure ────────────────────────────────────────────
+        console.error('[NeuralWorks] EmailJS send error:', err);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `Send Message ${SUBMIT_ICON}`;
+        showError();
+        showToast('Failed to send message. Please try again.', 'error');
+      }
     });
   }
 
@@ -307,6 +369,7 @@
   // MAIN INIT
   // ============================================================
   function init() {
+    initEmailJS();
     initNavbar();
     initSettings();
     initScrollReveal();
