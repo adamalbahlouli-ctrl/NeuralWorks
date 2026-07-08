@@ -8,10 +8,27 @@
 
   const STORAGE_KEY = 'nw-theme';
 
+  // ---- Safe LocalStorage helpers ----
+  function safeGet(key) {
+    try {
+      return localStorage.getItem(key);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function safeSet(key, val) {
+    try {
+      localStorage.setItem(key, val);
+    } catch (e) {
+      // Fail silently
+    }
+  }
+
   // ---- Apply theme immediately (before paint to avoid flash) ----
   function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem(STORAGE_KEY, theme);
+    safeSet(STORAGE_KEY, theme);
 
     // Update settings panel buttons
     const darkBtn  = document.getElementById('theme-dark');
@@ -33,7 +50,7 @@
 
   // ---- Load saved theme ----
   function loadTheme() {
-    const saved = localStorage.getItem(STORAGE_KEY);
+    const saved = safeGet(STORAGE_KEY);
     if (saved === 'light' || saved === 'dark') return saved;
     // Respect system preference
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
