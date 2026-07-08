@@ -61,7 +61,7 @@
     const categoryIcon = CATEGORY_ICONS[service.category] || CATEGORY_ICONS['Default'];
 
     const priceHTML = service.price
-      ? `<div class="service-card-price">From <span>$${escapeHtml(service.price)}</span></div>`
+      ? `<div class="service-card-price">From <span>$${service.price}</span></div>`
       : `<div class="service-card-price" style="color:transparent;">—</div>`;
 
     const badgeHTML = service.badge
@@ -157,7 +157,7 @@
         <p style="color:var(--text-muted);font-size:1rem;">
           Unable to load services. Please try again later.
         </p>
-        <p style="color:var(--text-muted);font-size:0.8rem;margin-top:8px;opacity:0.6;">${escapeHtml(message)}</p>
+        <p style="color:var(--text-muted);font-size:0.8rem;margin-top:8px;opacity:0.6;">${message}</p>
         <button onclick="window.location.reload()" class="btn btn-outline btn-sm" style="margin-top:24px;">
           Retry
         </button>

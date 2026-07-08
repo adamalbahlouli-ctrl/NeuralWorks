@@ -15,22 +15,16 @@
 
   function $$(selector, context = document) {
     return Array.from(context.querySelectorAll(selector));
+  }
+
   function showToast(message, type = 'success', duration = 4000) {
     const container = document.getElementById('toast-container');
     if (!container) return;
 
-    const icon = type === 'success' ? '✅' : '❌';
+    const icon = type === 'success' ? 'âœ…' : 'â Œ';
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
-    
-    // Use textContent to create DOM elements safely and avoid DOM XSS
-    const iconSpan = document.createElement('span');
-    iconSpan.textContent = icon + ' ';
-    const textSpan = document.createElement('span');
-    textSpan.textContent = message;
-
-    toast.appendChild(iconSpan);
-    toast.appendChild(textSpan);
+    toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
     toast.setAttribute('role', 'alert');
     container.appendChild(toast);
 
@@ -238,41 +232,14 @@
       e.preventDefault();
       hideMessages();
 
-      // --- 1. Honeypot check ---
-      const honeypot = form.nickname ? form.nickname.value.trim() : '';
-      if (honeypot) {
-        console.warn('[NeuralWorks] Spam bot detected via honeypot.');
-        // Fake success to trick spam bot
-        showSuccess();
-        showToast("Message sent! We'll get back to you shortly.", 'success');
-        form.reset();
-        return;
-      }
-
-      // --- 2. Cooldown check (Rate Limiting) ---
-      const COOLDOWN_MS = 60000; // 60 seconds
-      const lastSubmit = localStorage.getItem('nw-last-submit');
-      const now = Date.now();
-      if (lastSubmit && (now - lastSubmit) < COOLDOWN_MS) {
-        const remaining = Math.ceil((COOLDOWN_MS - (now - lastSubmit)) / 1000);
-        showToast(`Please wait ${remaining} seconds before sending another message.`, 'error');
-        return;
-      }
-
       const name    = form.name.value.trim();
       const email   = form.email.value.trim();
       const service = form.service ? form.service.value : '';
       const message = form.message.value.trim();
 
-      // ─── Input Sanitization & Validation ──────────────────────
+      // â”€â”€ Validation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       if (!name || !email || !message) {
         showToast('Please fill in all required fields.', 'error');
-        return;
-      }
-
-      // Max length enforcement
-      if (name.length > 100 || email.length > 150 || message.length > 5000) {
-        showToast('Input length limits exceeded.', 'error');
         return;
       }
 
@@ -281,13 +248,13 @@
         return;
       }
 
-      // ─── Loading state ───────────────────────────────────────
+      // â”€â”€ Loading state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       submitBtn.disabled = true;
-      submitBtn.textContent = 'Sending…';
+      submitBtn.textContent = 'Sendingâ€¦';
 
-      // ─── Send via EmailJS ────────────────────────────────────
+      // â”€â”€ Send via EmailJS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       if (typeof emailjs === 'undefined') {
-        // EmailJS not loaded — show error
+        // EmailJS not loaded â€” show error
         submitBtn.disabled = false;
         submitBtn.innerHTML = `Send Message ${SUBMIT_ICON}`;
         showError();
@@ -306,8 +273,7 @@
         const result = await emailjs.send("service_AdamNoxtary20085", "template_79xyy3w", templateParams);
         console.log(result);
 
-        // ─── Success ─────────────────────────────────────────────
-        localStorage.setItem('nw-last-submit', Date.now()); // Update last submission timestamp
+        // â”€â”€ Success â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         submitBtn.disabled = false;
         submitBtn.innerHTML = `Send Message ${SUBMIT_ICON}`;
         showSuccess();
@@ -318,7 +284,7 @@
         setTimeout(() => { if (success) success.style.display = 'none'; }, 6000);
 
       } catch (err) {
-        // ─── Failure ─────────────────────────────────────────────
+        // â”€â”€ Failure â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         console.error(err);
         submitBtn.disabled = false;
         submitBtn.innerHTML = `Send Message ${SUBMIT_ICON}`;
