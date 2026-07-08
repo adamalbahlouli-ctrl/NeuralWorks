@@ -169,6 +169,31 @@
         el.classList.add('visible');
       });
     });
+
+    // Pre-select service in contact form dropdown based on current service
+    const serviceSelect = document.getElementById('contact-service');
+    if (serviceSelect && service.title) {
+      let matched = false;
+      // Try matching by option text (title) or value (slug)
+      for (let opt of serviceSelect.options) {
+        if (
+          opt.value === service.slug ||
+          opt.textContent.trim().toLowerCase() === service.title.toLowerCase()
+        ) {
+          opt.selected = true;
+          matched = true;
+          break;
+        }
+      }
+      // Fallback: add a custom option pre-selected with the exact service title
+      if (!matched) {
+        const customOpt = document.createElement('option');
+        customOpt.value = service.slug;
+        customOpt.textContent = service.title;
+        customOpt.selected = true;
+        serviceSelect.insertBefore(customOpt, serviceSelect.options[1]);
+      }
+    }
   }
 
   // ---- Show error state ----
