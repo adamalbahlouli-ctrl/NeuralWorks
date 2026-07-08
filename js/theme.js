@@ -43,24 +43,29 @@
   }
 
   // ---- Init ----
+  function initButtons() {
+    const darkBtn  = document.getElementById('theme-dark');
+    const lightBtn = document.getElementById('theme-light');
+
+    if (darkBtn) {
+      darkBtn.addEventListener('click', () => applyTheme('dark'));
+    }
+    if (lightBtn) {
+      lightBtn.addEventListener('click', () => applyTheme('light'));
+    }
+
+    // Re-apply to sync button states
+    applyTheme(loadTheme());
+  }
+
   function init() {
     applyTheme(loadTheme());
 
-    // Wait for DOM
-    document.addEventListener('DOMContentLoaded', () => {
-      const darkBtn  = document.getElementById('theme-dark');
-      const lightBtn = document.getElementById('theme-light');
-
-      if (darkBtn) {
-        darkBtn.addEventListener('click', () => applyTheme('dark'));
-      }
-      if (lightBtn) {
-        lightBtn.addEventListener('click', () => applyTheme('light'));
-      }
-
-      // Re-apply to sync button states
-      applyTheme(loadTheme());
-    });
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initButtons);
+    } else {
+      initButtons();
+    }
   }
 
   // Apply instantly (runs before DOMContentLoaded)

@@ -1,5 +1,5 @@
 /**
- * NeuralWorks â€” Main Application Script
+ * NeuralWorks — Main Application Script
  * Navigation, settings panel, scroll reveal, contact form, toast notifications
  */
 
@@ -9,28 +9,30 @@
   // ============================================================
   // UTILITIES
   // ============================================================
-  function $(selector, context = document) {
-    return context.querySelector(selector);
+  function $(selector, context) {
+    return (context || document).querySelector(selector);
   }
 
-  function $$(selector, context = document) {
-    return Array.from(context.querySelectorAll(selector));
+  function $$(selector, context) {
+    return Array.from((context || document).querySelectorAll(selector));
   }
 
-  function showToast(message, type = 'success', duration = 4000) {
-    const container = document.getElementById('toast-container');
+  function showToast(message, type, duration) {
+    type = type || 'success';
+    duration = duration || 4000;
+    var container = document.getElementById('toast-container');
     if (!container) return;
 
-    const icon = type === 'success' ? 'âœ…' : 'â Œ';
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+    var icon = type === 'success' ? '✅' : '❌';
+    var toast = document.createElement('div');
+    toast.className = 'toast ' + type;
+    toast.innerHTML = '<span>' + icon + '</span> <span>' + message + '</span>';
     toast.setAttribute('role', 'alert');
     container.appendChild(toast);
 
-    setTimeout(() => {
+    setTimeout(function () {
       toast.style.animation = 'toastOut 0.3s ease forwards';
-      setTimeout(() => toast.remove(), 300);
+      setTimeout(function () { toast.remove(); }, 300);
     }, duration);
   }
 
@@ -38,17 +40,17 @@
   // NAVBAR
   // ============================================================
   function initNavbar() {
-    const navbar    = document.getElementById('navbar');
-    const hamburger = document.getElementById('hamburger');
-    const drawer    = document.getElementById('nav-drawer');
+    var navbar    = document.getElementById('navbar');
+    var hamburger = document.getElementById('hamburger');
+    var drawer    = document.getElementById('nav-drawer');
 
     if (!navbar) return;
 
     // Scroll effect
-    let ticking = false;
-    window.addEventListener('scroll', () => {
+    var ticking = false;
+    window.addEventListener('scroll', function () {
       if (!ticking) {
-        requestAnimationFrame(() => {
+        requestAnimationFrame(function () {
           navbar.classList.toggle('scrolled', window.scrollY > 20);
           ticking = false;
         });
@@ -58,15 +60,15 @@
 
     // Hamburger toggle
     if (hamburger && drawer) {
-      hamburger.addEventListener('click', () => {
-        const isOpen = drawer.classList.toggle('open');
+      hamburger.addEventListener('click', function () {
+        var isOpen = drawer.classList.toggle('open');
         hamburger.classList.toggle('open', isOpen);
-        hamburger.setAttribute('aria-expanded', isOpen.toString());
+        hamburger.setAttribute('aria-expanded', String(isOpen));
       });
 
       // Close drawer when a link is clicked
-      $$('.nav-link', drawer).forEach(link => {
-        link.addEventListener('click', () => {
+      $$('.nav-link', drawer).forEach(function (link) {
+        link.addEventListener('click', function () {
           drawer.classList.remove('open');
           hamburger.classList.remove('open');
           hamburger.setAttribute('aria-expanded', 'false');
@@ -74,7 +76,7 @@
       });
 
       // Close on outside click
-      document.addEventListener('click', e => {
+      document.addEventListener('click', function (e) {
         if (!navbar.contains(e.target) && !drawer.contains(e.target)) {
           drawer.classList.remove('open');
           hamburger.classList.remove('open');
@@ -84,18 +86,18 @@
     }
 
     // Active nav link on scroll
-    const sections = $$('section[id]');
-    const navLinks = $$('.nav-link[href^="#"]');
+    var sections = $$('section[id]');
+    var navLinks = $$('.nav-link[href^="#"]');
 
     function updateActiveLink() {
-      const scrollY = window.scrollY + 120;
-      let active = '';
-      sections.forEach(section => {
+      var scrollY = window.scrollY + 120;
+      var active = '';
+      sections.forEach(function (section) {
         if (scrollY >= section.offsetTop) {
-          active = `#${section.id}`;
+          active = '#' + section.id;
         }
       });
-      navLinks.forEach(link => {
+      navLinks.forEach(function (link) {
         link.classList.toggle('active', link.getAttribute('href') === active);
       });
     }
@@ -108,15 +110,20 @@
   // SETTINGS PANEL
   // ============================================================
   function initSettings() {
-    const overlay   = document.getElementById('settings-overlay');
-    const panel     = document.getElementById('settings-panel');
-    const closeBtn  = document.getElementById('settings-close');
-    const triggers  = [
+    var overlay  = document.getElementById('settings-overlay');
+    var panel    = document.getElementById('settings-panel');
+    var closeBtn = document.getElementById('settings-close');
+
+    // Collect ALL trigger buttons (navbar + drawer)
+    var triggers = [
       document.getElementById('settings-trigger'),
-      document.getElementById('drawer-settings'),
+      document.getElementById('drawer-settings')
     ].filter(Boolean);
 
-    if (!overlay || !panel) return;
+    if (!overlay || !panel) {
+      console.warn('[NeuralWorks] Settings panel elements not found.');
+      return;
+    }
 
     function openSettings() {
       overlay.classList.add('open');
@@ -124,7 +131,7 @@
       panel.classList.add('open');
       panel.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
-      closeBtn && closeBtn.focus();
+      if (closeBtn) closeBtn.focus();
     }
 
     function closeSettings() {
@@ -135,28 +142,40 @@
       document.body.style.overflow = '';
     }
 
-    triggers.forEach(btn => btn.addEventListener('click', openSettings));
-    if (closeBtn) closeBtn.addEventListener('click', closeSettings);
+    triggers.forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        openSettings();
+      });
+    });
+
+    if (closeBtn) {
+      closeBtn.addEventListener('click', closeSettings);
+    }
+
     overlay.addEventListener('click', closeSettings);
 
     // Keyboard escape
-    document.addEventListener('keydown', e => {
+    document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && panel.classList.contains('open')) {
         closeSettings();
       }
     });
 
     // Trap focus inside panel
-    panel.addEventListener('keydown', e => {
+    panel.addEventListener('keydown', function (e) {
       if (e.key !== 'Tab') return;
-      const focusable = $$('button, a, input, select, textarea', panel)
-        .filter(el => !el.disabled);
+      var focusable = $$('button, a, input, select, textarea', panel)
+        .filter(function (el) { return !el.disabled; });
       if (focusable.length === 0) return;
-      const first = focusable[0], last = focusable[focusable.length - 1];
+      var first = focusable[0];
+      var last  = focusable[focusable.length - 1];
       if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault(); last.focus();
+        e.preventDefault();
+        last.focus();
       } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault(); first.focus();
+        e.preventDefault();
+        first.focus();
       }
     });
   }
@@ -165,11 +184,18 @@
   // SCROLL REVEAL
   // ============================================================
   function initScrollReveal() {
-    const elements = $$('.reveal');
+    var elements = $$('.reveal');
     if (elements.length === 0) return;
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
+    if (typeof IntersectionObserver === 'undefined') {
+      elements.forEach(function (el) {
+        el.classList.add('visible');
+      });
+      return;
+    }
+
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
         if (entry.isIntersecting) {
           entry.target.classList.add('visible');
           observer.unobserve(entry.target);
@@ -177,41 +203,36 @@
       });
     }, {
       threshold: 0.1,
-      rootMargin: '0px 0px -60px 0px',
+      rootMargin: '0px 0px -60px 0px'
     });
 
-    elements.forEach(el => observer.observe(el));
+    elements.forEach(function (el) { observer.observe(el); });
   }
 
   // ============================================================
   // CONTACT FORM — EmailJS Integration
   // ============================================================
-
-  // -----------------------------------------------------------
-  // Replace these three values after setting up your EmailJS account.
-  // See the setup guide in the README / walkthrough artifact.
-  var EMAILJS_PUBLIC_KEY  = 'LQnmFTXdf1e3jfTU0';           // Account API Keys
-  var EMAILJS_SERVICE_ID  = 'service_AdamNoxtary20085';              // Email Services tab
-  var EMAILJS_TEMPLATE_ID = 'template_79xyy3w';             // Email Templates tab
-  // -----------------------------------------------------------
+  var EMAILJS_PUBLIC_KEY  = 'LQnmFTXdf1e3jfTU0';
+  var EMAILJS_SERVICE_ID  = 'service_AdamNoxtary20085';
+  var EMAILJS_TEMPLATE_ID = 'template_79xyy3w';
 
   function initEmailJS() {
     if (typeof emailjs === 'undefined') {
       console.warn('[NeuralWorks] EmailJS library not loaded.');
       return;
     }
-    emailjs.init("LQnmFTXdf1e3jfTU0");
+    emailjs.init(EMAILJS_PUBLIC_KEY);
   }
 
   function initContactForm() {
-    const form      = document.getElementById('contact-form');
-    const submitBtn = document.getElementById('contact-submit');
-    const success   = document.getElementById('form-success');
-    const errorBox  = document.getElementById('form-error');
+    var form      = document.getElementById('contact-form');
+    var submitBtn = document.getElementById('contact-submit');
+    var success   = document.getElementById('form-success');
+    var errorBox  = document.getElementById('form-error');
 
     if (!form) return;
 
-    const SUBMIT_ICON = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`;
+    var SUBMIT_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
 
     function showSuccess() {
       if (success)  { success.style.display  = 'block'; }
@@ -228,16 +249,16 @@
       if (errorBox) errorBox.style.display = 'none';
     }
 
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener('submit', function (e) {
       e.preventDefault();
       hideMessages();
 
-      const name    = form.name.value.trim();
-      const email   = form.email.value.trim();
-      const service = form.service ? form.service.value : '';
-      const message = form.message.value.trim();
+      var name    = form.elements['name']    ? form.elements['name'].value.trim()    : '';
+      var email   = form.elements['email']   ? form.elements['email'].value.trim()   : '';
+      var service = form.elements['service'] ? form.elements['service'].value        : '';
+      var message = form.elements['message'] ? form.elements['message'].value.trim() : '';
 
-      // â”€â”€ Validation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      // Validation
       if (!name || !email || !message) {
         showToast('Please fill in all required fields.', 'error');
         return;
@@ -248,49 +269,45 @@
         return;
       }
 
-      // â”€â”€ Loading state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      // Loading state
       submitBtn.disabled = true;
-      submitBtn.textContent = 'Sendingâ€¦';
+      submitBtn.textContent = 'Sending…';
 
-      // â”€â”€ Send via EmailJS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      // EmailJS not loaded check
       if (typeof emailjs === 'undefined') {
-        // EmailJS not loaded â€” show error
         submitBtn.disabled = false;
-        submitBtn.innerHTML = `Send Message ${SUBMIT_ICON}`;
+        submitBtn.innerHTML = 'Send Message ' + SUBMIT_ICON;
         showError();
         showToast('Email service unavailable. Please try again later.', 'error');
         return;
       }
 
-      try {
-        const templateParams = {
-          name:    name,
-          email:   email,
-          service: service || 'Not specified',
-          message: message,
-        };
+      var templateParams = {
+        name:    name,
+        email:   email,
+        service: service || 'Not specified',
+        message: message
+      };
 
-        const result = await emailjs.send("service_AdamNoxtary20085", "template_79xyy3w", templateParams);
-        console.log(result);
-
-        // â”€â”€ Success â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = `Send Message ${SUBMIT_ICON}`;
-        showSuccess();
-        showToast("Message sent! We'll get back to you shortly.", 'success');
-        form.reset();
-
-        // Auto-hide success message after 6 s
-        setTimeout(() => { if (success) success.style.display = 'none'; }, 6000);
-
-      } catch (err) {
-        // â”€â”€ Failure â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        console.error(err);
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = `Send Message ${SUBMIT_ICON}`;
-        showError();
-        showToast('Failed to send message. Please try again.', 'error');
-      }
+      emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
+        .then(function (result) {
+          console.log('[NeuralWorks] Email sent:', result);
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = 'Send Message ' + SUBMIT_ICON;
+          showSuccess();
+          showToast("Message sent! We'll get back to you shortly.", 'success');
+          form.reset();
+          setTimeout(function () {
+            if (success) success.style.display = 'none';
+          }, 6000);
+        })
+        .catch(function (err) {
+          console.error('[NeuralWorks] Email failed:', err);
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = 'Send Message ' + SUBMIT_ICON;
+          showError();
+          showToast('Failed to send message. Please try again.', 'error');
+        });
     });
   }
 
@@ -298,15 +315,18 @@
   // SMOOTH SCROLL
   // ============================================================
   function initSmoothScroll() {
-    $$('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', e => {
-        const target = document.querySelector(anchor.getAttribute('href'));
+    $$('a[href^="#"]').forEach(function (anchor) {
+      anchor.addEventListener('click', function (e) {
+        var href   = anchor.getAttribute('href');
+        var target = document.querySelector(href);
         if (target) {
           e.preventDefault();
-          const offset = parseInt(getComputedStyle(document.documentElement)
-            .getPropertyValue('--nav-height'), 10) || 72;
-          const top = target.getBoundingClientRect().top + window.scrollY - offset;
-          window.scrollTo({ top, behavior: 'smooth' });
+          var offset = parseInt(
+            getComputedStyle(document.documentElement).getPropertyValue('--nav-height'),
+            10
+          ) || 72;
+          var top = target.getBoundingClientRect().top + window.scrollY - offset;
+          window.scrollTo({ top: top, behavior: 'smooth' });
         }
       });
     });
@@ -316,18 +336,27 @@
   // COUNTER ANIMATION
   // ============================================================
   function initCounters() {
-    const stats = $$('.hero-stat-value');
+    var stats = $$('.hero-stat-value');
     if (stats.length === 0) return;
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
+    if (typeof IntersectionObserver === 'undefined') {
+      stats.forEach(function (el) {
+        var target  = parseInt(el.getAttribute('data-count')) || 0;
+        var suffix  = el.textContent.replace(/[0-9]/g, '').replace(String(target), '');
+        el.textContent = target + suffix;
+      });
+      return;
+    }
+
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
         if (!entry.isIntersecting) return;
-        const el      = entry.target;
-        const target  = parseInt(el.getAttribute('data-count')) || 0;
-        const suffix  = el.textContent.replace(/[0-9]/g, '').replace(target.toString(), '');
-        let current   = 0;
-        const step    = Math.ceil(target / 60);
-        const timer   = setInterval(() => {
+        var el      = entry.target;
+        var target  = parseInt(el.getAttribute('data-count')) || 0;
+        var suffix  = el.textContent.replace(/[0-9]/g, '').replace(String(target), '');
+        var current = 0;
+        var step    = Math.ceil(target / 60);
+        var timer   = setInterval(function () {
           current = Math.min(current + step, target);
           el.textContent = current + suffix;
           if (current >= target) clearInterval(timer);
@@ -336,20 +365,20 @@
       });
     }, { threshold: 0.5 });
 
-    stats.forEach(stat => observer.observe(stat));
+    stats.forEach(function (stat) { observer.observe(stat); });
   }
 
   // ============================================================
   // IMAGE LAZY LOAD WITH FADE-IN
   // ============================================================
   function initLazyImages() {
-    if ('loading' in HTMLImageElement.prototype) return; // native lazy loading available
+    if ('loading' in HTMLImageElement.prototype) return;
 
-    const images = $$('img[loading="lazy"]');
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
+    var images = $$('img[loading="lazy"]');
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
         if (entry.isIntersecting) {
-          const img = entry.target;
+          var img = entry.target;
           if (img.dataset.src) {
             img.src = img.dataset.src;
           }
@@ -359,10 +388,10 @@
       });
     });
 
-    images.forEach(img => {
+    images.forEach(function (img) {
       img.style.opacity = '0';
       img.style.transition = 'opacity 0.4s ease';
-      img.addEventListener('load', () => { img.style.opacity = '1'; });
+      img.addEventListener('load', function () { img.style.opacity = '1'; });
       observer.observe(img);
     });
   }
@@ -371,17 +400,27 @@
   // MAIN INIT
   // ============================================================
   function init() {
-    initEmailJS();
-    initNavbar();
-    initSettings();
-    initScrollReveal();
-    initContactForm();
-    initSmoothScroll();
-    initCounters();
-    initLazyImages();
+    var modules = [
+      { name: 'EmailJS', fn: initEmailJS },
+      { name: 'Navbar', fn: initNavbar },
+      { name: 'Settings', fn: initSettings },
+      { name: 'ScrollReveal', fn: initScrollReveal },
+      { name: 'ContactForm', fn: initContactForm },
+      { name: 'SmoothScroll', fn: initSmoothScroll },
+      { name: 'Counters', fn: initCounters },
+      { name: 'LazyImages', fn: initLazyImages }
+    ];
+
+    modules.forEach(function (mod) {
+      try {
+        mod.fn();
+      } catch (err) {
+        console.error('[NeuralWorks] Error initializing ' + mod.name + ':', err);
+      }
+    });
 
     // Global error handler for unhandled promise rejections
-    window.addEventListener('unhandledrejection', event => {
+    window.addEventListener('unhandledrejection', function (event) {
       console.warn('[NeuralWorks] Unhandled rejection:', event.reason);
     });
   }
@@ -393,5 +432,5 @@
   }
 
   // Expose utilities
-  window.NW = { showToast };
+  window.NW = { showToast: showToast };
 })();
