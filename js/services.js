@@ -10,6 +10,19 @@
   const SERVICES_URL = 'data/services.json';
   const PRODUCT_PAGE = 'Product.html';
 
+  // ---- Inline fallback (used if fetch fails e.g. file:// protocol) ----
+  const SERVICES_FALLBACK = [
+    { id:'1', slug:'create-professional-website', title:'Create Professional Website', description:'We craft custom, fully responsive websites built with modern technologies focused on performance, SEO, and user experience.', price:'', category:'Web Development', image:'https://i.postimg.cc/ydL8G7V3/file-00000000d2c472468ac72117f2a0fe03.png', badge:'Best Seller', popular:true },
+    { id:'2', slug:'research-writing', title:'Research Writing', description:'Professional academic and technical research writing tailored to your needs. Well-structured, thoroughly researched and properly cited content.', price:'10', category:'Writing', image:'https://i.postimg.cc/Y9YxNyMm/file-00000000429871f4a6ff4446f56b4694.png', badge:'Popular', popular:true },
+    { id:'3', slug:'mobile-app-development', title:'Mobile App Development', description:'Native and cross-platform mobile applications for iOS and Android that deliver smooth, engaging experiences.', price:'', category:'Mobile Development', image:'https://i.postimg.cc/tgVcfkpM/file-00000000217c71f495aa63acf81082ea.png', badge:'Premium', popular:false },
+    { id:'4', slug:'professional-css-design', title:'Professional CSS Design', description:'Transform your web presence with modern UI styling and responsive CSS development across all devices.', price:'', category:'Design', image:'https://i.postimg.cc/Bn5Lg917/file-00000000480072468e46a0d7d710e9c3.png', badge:'', popular:false },
+    { id:'5', slug:'website-bug-fixing-security-audit', title:'Website Bug Fixing & Security Audit', description:'Comprehensive bug fixing, performance optimization, and security auditing for your existing website.', price:'', category:'Maintenance', image:'https://i.postimg.cc/vTmkPsB4/file-00000000a21871f4b7a0488050ef5378.png', badge:'Guaranteed', popular:false },
+    { id:'6', slug:'one-month-technical-support', title:'One Month Technical Support', description:'Get dedicated technical support for an entire month ensuring your digital products run smoothly.', price:'', category:'Support', image:'https://i.postimg.cc/YqYZbbqM/file-00000000302471f4af9cb0b42211d742.png', badge:'Value Pick', popular:false },
+    { id:'7', slug:'game-mod-development', title:'Game Mod Development', description:'Bring new life to your favorite games with custom mods designed and developed by experts.', price:'', category:'Gaming', image:'https://i.postimg.cc/X7sdS0vr/file-0000000032fc71f484618328d0b129e5.png', badge:'Unique', popular:false },
+    { id:'8', slug:'professional-research-writing', title:'Professional Research Writing', description:'Well-structured, meticulously written professional reports, articles, and technical documentation.', price:'', category:'Writing', image:'https://i.postimg.cc/bJqwwsCf/file-0000000057c07246b01cdc58bc37148e.png', badge:'', popular:false },
+    { id:'9', slug:'music-song-production', title:'Music & Song Production', description:'Professional music and song production combining human artistry with AI-assisted tools.', price:'', category:'Music', image:'https://i.postimg.cc/BbKTTgrV/file-00000000d1fc71f4b6e25ced763d0ae5.png', badge:'Creative', popular:false }
+  ];
+
   // ---- Category Icon Map ----
   const CATEGORY_ICONS = {
     'Web Development':    '🌐',
@@ -172,14 +185,16 @@
 
     renderSkeletons(grid, 9);
 
+    let services;
     try {
-      const services = await fetchServices();
-      // Small delay so skeletons are visible (better UX perception)
-      setTimeout(() => renderServices(grid, services), 400);
+      services = await fetchServices();
     } catch (err) {
-      console.error('[NeuralWorks] Services load error:', err);
-      renderError(grid, err.message);
+      console.warn('[NeuralWorks] fetch failed, using inline fallback:', err.message);
+      services = SERVICES_FALLBACK;
     }
+
+    // Small delay so skeletons are visible (better UX perception)
+    setTimeout(() => renderServices(grid, services), 400);
   }
 
   // ---- Utility: escape HTML ----

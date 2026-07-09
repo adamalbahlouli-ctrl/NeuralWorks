@@ -3,32 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script>
-    window.addEventListener('error', function(e) {
-      var div = document.getElementById('debug-error-banner');
-      if (!div) {
-        div = document.createElement('div');
-        div.id = 'debug-error-banner';
-        div.style.position = 'fixed';
-        div.style.top = '10px';
-        div.style.left = '10px';
-        div.style.right = '10px';
-        div.style.padding = '15px';
-        div.style.background = '#ff4d4d';
-        div.style.color = 'white';
-        div.style.zIndex = '99999';
-        div.style.borderRadius = '8px';
-        div.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
-        div.style.fontFamily = 'monospace';
-        div.style.fontSize = '12px';
-        var target = document.body || document.documentElement;
-        if (target) {
-          target.appendChild(div);
-        }
-      }
-      div.innerHTML = '<strong>JS Error:</strong> ' + e.message + ' <br><strong>File:</strong> ' + e.filename + ':' + e.lineno;
-    });
-  </script>
   <meta name="description" content="NeuralWorks — Service Details. Premium digital services built with expertise and innovation." />
   <meta name="author" content="Adam EL Bahlouli" />
   <title>Service Details — NeuralWorks</title>
@@ -460,8 +434,8 @@
 <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
 <!-- Scripts -->
-<!-- EmailJS CDN -->
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" defer></script>
+<!-- EmailJS: loaded synchronously so it is available before main.js runs -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="js/theme.js" defer></script>
 <script src="js/main.js" defer></script>
 <script src="js/product.js" defer></script>

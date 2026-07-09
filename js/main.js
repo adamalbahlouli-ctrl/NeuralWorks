@@ -188,9 +188,7 @@
     if (elements.length === 0) return;
 
     if (typeof IntersectionObserver === 'undefined') {
-      elements.forEach(function (el) {
-        el.classList.add('visible');
-      });
+      elements.forEach(function (el) { el.classList.add('visible'); });
       return;
     }
 
@@ -202,11 +200,17 @@
         }
       });
     }, {
-      threshold: 0.1,
-      rootMargin: '0px 0px -60px 0px'
+      threshold: 0.05,
+      rootMargin: '0px 0px 0px 0px'
     });
 
     elements.forEach(function (el) { observer.observe(el); });
+
+    // Fallback: after 1.5s force-show all remaining hidden reveals
+    // (handles cases where IntersectionObserver misses off-screen elements)
+    setTimeout(function () {
+      elements.forEach(function (el) { el.classList.add('visible'); });
+    }, 1500);
   }
 
   // ============================================================
